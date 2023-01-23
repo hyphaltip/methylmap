@@ -121,7 +121,7 @@ def meth_browser(
             fig.append_trace(trace=annot_trace, row=num_row, col=1)
         fig.update_xaxes(title_text="", showticklabels=False, zeroline=False, row=num_row, col=1)
         fig.update_yaxes(title_text="", showticklabels=True, zeroline=False, row=num_row, col=1)
-    
+
     if dendro:
         for trace in den.select_traces():
             fig.add_trace(trace, row=1, col=num_col)
@@ -137,7 +137,8 @@ def meth_browser(
         fig['layout']['xaxis2']['tickvals'] = den.layout.xaxis.tickvals
         fig['layout']['xaxis2']['ticktext'] = list_sorted_samples
 
-    plots.create_output_methylmap(fig,outfig, window)
+    plots.create_output_methylmap(fig, outfig, window)
+
 
 if __name__ == "__main__":
     main()

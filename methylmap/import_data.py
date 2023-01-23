@@ -3,7 +3,6 @@ import sys
 import gzip
 import logging
 import subprocess
-import numpy as np
 import pandas as pd
 from pathlib import Path
 
@@ -13,7 +12,7 @@ class Region(object):
         try:
             self.chromosome, interval = region.replace(",", "").split(":")
             try:
-                #see if just integer chromosomes are used
+                # see if just integer chromosomes are used
                 self.chromosome = int(self.chromosome)
             except ValueError:
                 pass
@@ -26,7 +25,7 @@ class Region(object):
         if expand:
             self.begin = self.begin - int(expand)
             self.end = self.end + int(expand)
-        self.start = self.begin #start as alias for begin
+        self.start = self.begin  # start as alias for begin
         self.size = self.end - self.begin
         if self.size < 0:
             sys.exit(
@@ -55,13 +54,13 @@ def read_mods(files, table, names, window, groups, gff, fasta, mod, dendro):
         elif file_type in ["cram", "bam"]:
             rc = subprocess.call(['which', 'modbam2bed'])
             if not rc == 0:
-                sys.exit(f"\n\n\nIs modbam2bed installed? Installation: mamba install -c epi2melabs modbam2bed")
+                sys.exit("\n\n\nIs modbam2bed installed? Installation: mamba install -c epi2melabs modbam2bed")
             else:
                 return parse_bam(files, table, names, window, groups, fasta, mod, dendro)
         elif file_type in ["overviewtable_bam", "overviewtable_cram"]:
             rc = subprocess.call(['which', 'modbam2bed'])
             if not rc == 0:
-                sys.exit(f"\n\n\nIs modbam2bed installed? Instalation: mamba install -c epi2melabs modbam2bed")
+                sys.exit("\n\n\nIs modbam2bed installed? Instalation: mamba install -c epi2melabs modbam2bed")
             else:
                 return parse_bam(files, table, names, window, groups, fasta, mod, dendro)
     except Exception as e:
@@ -228,12 +227,10 @@ def parse_methfrequencytable(table, names, window, groups, gff, dendro):
     if groups:
         logging.info("Sort columns of methfrequencytable based on group")
         if dendro:
-                logging.warning(
-                    "Columns will not be sorted based on --group input since hierarchical clustering with --dendro is requested."
-                )
-                sys.stderr.write(
-                    "Columns will not be sorted based on --group input since hierarchical clustering with --dendro is requested."
-                )
+            logging.warning(
+                "Columns will not be sorted based on --group input since hierarchical clustering with --dendro is requested.")
+            sys.stderr.write(
+                "Columns will not be sorted based on --group input since hierarchical clustering with --dendro is requested.")
         else:
             headerlist = list(df.columns.values)
             if len(headerlist) == len(groups):
@@ -303,7 +300,9 @@ def parse_bam(files, table, names, window, groups, fasta, mod, dendro):
             "methylated_frequency",
         ]
 
-        table = pd.read_csv(modbam_stream.stdout, sep="\t", header=None,names=headerlist, usecols=["position","methylated_frequency"])
+        table = pd.read_csv(modbam_stream.stdout, sep="\t", header=None,
+                            names=headerlist,
+                            usecols=["position", "methylated_frequency"])
         logging.info("Read the file in a dataframe.")
         table = table.set_index("position")
         dfs.append(table.rename(columns={"methylated_frequency": name}))
@@ -312,10 +311,10 @@ def parse_bam(files, table, names, window, groups, fasta, mod, dendro):
 
     if len(methfrequencytable) == 0:
         logging.error(
-            f"WARNING: length of methylation frequency table is zero. Do the input files contain data?"
+            "WARNING: length of methylation frequency table is zero. Do the input files contain data?"
         )
         sys.exit(
-            f"WARNING: length of methylation frequency table is zero. Do the input files contain data?"
+            "WARNING: length of methylation frequency table is zero. Do the input files contain data?"
         )
 
     methfreqtable = methfrequencytable.sort_values("position", ascending=True)
@@ -340,7 +339,7 @@ def parse_bam(files, table, names, window, groups, fasta, mod, dendro):
                 else:
                     sys.exit(
                         f"ERROR when matching --groups with samples, is length of --groups list ({len(groups)}) matching with number of sample files?")
-                    
+
     return methfreqtable, window
 
 
@@ -367,13 +366,13 @@ def file_sniffer(filename):
         return "nanopolish_calc_meth_freq"
     if "path" in header:  # overviewtable
         df = pd.read_table(filename)
-        if df["path"].iloc[0].endswith(".tsv"):  ###only checks first file in overviewtable
+        if df["path"].iloc[0].endswith(".tsv"):  # only checks first file in overviewtable
             return "overviewtable_nanopolishfiles"
-        elif df["path"].iloc[0].endswith(".tsv.gz"):  ###only checks first file in overviewtable
+        elif df["path"].iloc[0].endswith(".tsv.gz"):  # only checks first file in overviewtable
             return "overviewtable_nanopolishfiles"
-        elif df["path"].iloc[0].endswith(".bam"):  ####only checks first file in overviewtable
+        elif df["path"].iloc[0].endswith(".bam"):  # only checks first file in overviewtable
             return "overviewtable_bam"
-        elif df["path"].iloc[0].endswith(".cram"):  ####only checks first file in overviewtable
+        elif df["path"].iloc[0].endswith(".cram"):  # only checks first file in overviewtable
             return "overviewtable_cram"
     if header.startswith("chrom"):
         # own methfrequencytable as input: needs first column header to be "chrom"
